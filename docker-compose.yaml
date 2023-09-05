@@ -1,0 +1,8 @@
+version: '3.3'
+services:
+    grass_calculator:
+        build: .
+        working_dir: /code
+        ports:
+            - '127.0.0.1:8080:5000'
+        image: grass_calculator
