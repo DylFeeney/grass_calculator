@@ -2,11 +2,26 @@ version: '3.3'
 services:
     grass_calculator:
         build: .
+        image: grass_calculator
+        container_name: grass_calculator
         working_dir: /code
         ports:
             - '127.0.0.1:8080:5000'
-        image: grass_calculator
         volumes:
             - type: bind
               source: ./app
               target: /code
+
+    database:
+      image: mongo:7.0.1
+      container_name: mongodb
+      environment:
+        MONGO_INITDB_ROOT_USERNAME: root
+        MONGO_INITDB_ROOT_PASSWORD: rootpassword
+      ports:
+        - 27017:27017
+      volumes:
+        - mongodb_data_container:/data/db
+
+volumes:
+  mongodb_data_container:

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Grass Player Information</title>
+    <link rel="stylesheet" href="static/bootstrap/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="row mt-5">
+            <div class="col-sm-3">
+                <a href="http://localhost:8080">
+                    <button type="button" class="btn btn-success">Return Home</button>
+                </a>
+            </div>
+            <div class="col-sm-9">
+                <h1>Grass - Enter Player Name</h1>
+            </div>
+        </div>
+        <div class="row">
+            <form action = "http://localhost:8080/players" method="POST">
+                <div class="form-group">
+                    <label for="player">Number player name</label>
+                    <input type="text" class="form-control" id="player" name="player">
+                </div>
+                <button type="submit" class="btn btn-success" value="Submit">Submit</button>
+            </form>
+        </div>
+        <div class="col mt-5">
+            <div class="row">
+                <h2>Players</h2>
+            </div>
+            <div class="row">
+                <ul>
+                {% for key in players %}
+                   <li> {{ key }} </li>
+                {% endfor %}
+            </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
