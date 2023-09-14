@@ -40,8 +40,7 @@ def hello_world():
     mongo_client = create_mongo_client()
     test_insert(mongo_client)
     #get_database()
-    return "<p>Hello, World.</p>"
-
+    return render_template('index.html')
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", debug=True)
