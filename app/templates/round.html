@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Grass - Enter round information</title>
+    <link rel="stylesheet" href="static/bootstrap/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="row mt-5">
+            <div class="col-sm-3">
+                <a href="http://localhost:8080">
+                    <button type="button" class="btn btn-success">Return Home</button>
+                </a>
+            </div>
+            <div class="col-sm-9">
+                <p class="h1">
+                    Grass Scoreboard - Round {{round}}
+                </p>
+            </div>
+        </div>
+        <div class="row mt-5">
+            <div class="col">
+                <form class="bp-5" action="http://localhost:8080/round-entry" method="POST" id="form">
+                    {% for i in range (0, number_of_players) %}
+                        <div class="row">
+                            <h2>{{ player_names[i] }}</h2>
+                        </div>
+                        <div class="row">
+                            <input type="hidden" id="user_name" name="user_name" value="{{ player_names[i] }}">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="protected_peddle">Protected Peddle Value</label>
+                                    <input type="number" min="0" value="0" class="form-control" id="protected_peddle" name="protected_peddle">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="unprotected_peddle">Unprotected Peddle Value</label>
+                                    <input type="number" min="0" value="0" class="form-control" id="unprotected_peddle" name="unprotected_peddle">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="highest_peddle_in_hand">Highest Peddle Card in Hand</label>
+                                    <input type="number" min="0" value="0" class="form-control" id="highest_peddle_in_hand" name="highest_peddle_in_hand">
+                                </div>
+                                <br>
+                            </div>
+                            <div class="col">
+                                <h3>Rewards</h3>
+                                <input type="hidden" id="has_banker" name="has_banker" value="0">
+                                <input type="checkbox" id="has_banker" name="has_banker" value="1">
+                                <label for="has_banker">Banker Card</label>
+                                <br>
+
+                                <h3>Penalties</h3>
+                                <div class="form-check">
+                                    <input type="hidden" id="has_sold_out1" name="has_sold_out" value="0">
+                                    <input class="form-check-input" type="checkbox" id="has_sold_out1" name="has_sold_out" value="1">
+                                    <label class="form-check-label" for="has_sold_out1">Sold Out</label>
+                                </div>
+                                <div class="form-check">
+                                    <input type="hidden" id="has_double_crossed" name="has_double_crossed" value="0">
+                                    <input class="form-check-input" type="checkbox" id="has_double_crossed" name="has_double_crossed" value="1">
+                                    <label class="form-check-label" for="has_double_crossed">Doublecrossed</label>
+                                </div>
+                                <div class="form-check">
+                                    <input type="hidden" id="has_utterly_wiped_out" name="has_utterly_wiped_out" value="0">
+                                    <input class="form-check-input" type="checkbox" id="has_utterly_wiped_out" name="has_utterly_wiped_out" value="1">
+                                    <label class="form-check-label" for="has_utterly_wiped_out">Utterly Wiped Out</label>
+                                </div>
+                            </div>
+                        </div>
+                        <hr/>
+                    {%  endfor %}
+                    <br>
+                    <div class="row justify-content-md-center mt-2 mb-2">
+                        <button type="submit" class="btn btn-success" value="Submit">Submit round information</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
