@@ -6,7 +6,7 @@ players = Blueprint('players', __name__, template_folder='templates')
 
 @players.route('/players', methods=['POST', 'GET'])
 def players_page():
-    client = mongo_setup()
+    client = Mongo()
 
     if request.method == 'POST':
         player_name = request.form.get('player')
@@ -16,6 +16,3 @@ def players_page():
     player_list = client.list_players("game_1", "players")
     return render_template('player_info.html', players=player_list)
 
-def mongo_setup():
-    mongo = Mongo()
-    return mongo
