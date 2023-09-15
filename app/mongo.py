@@ -32,6 +32,7 @@ class Mongo:
 
         return player_names
 
+    # Round number information
     def retrieve_round_number(self, database_name):
         round_numbers = "round_numbers"
         database, collection = self.retrieve_collection(database_name, round_numbers)

@@ -12,7 +12,6 @@ def round_entry_page():
     if request.method == 'POST':
         formatted_form_data = get_request_form_values(request)
 
-
     player_list = client.list_players("game_1", "players")
     return render_template('round.html', round=round_number, player_names=player_list,
                            number_of_players=len(player_list))
@@ -29,7 +28,7 @@ def get_request_form_values(incoming_request):
     has_utterly_wiped_out = process_checkbox_list(incoming_request.form.getlist('has_utterly_wiped_out'))
 
     data = format_request_input(user_name, protected_peddle, unprotected_peddle, highest_peddle_in_hand, has_banker,
-                         has_sold_out, has_double_crossed, has_utterly_wiped_out)
+                                has_sold_out, has_double_crossed, has_utterly_wiped_out)
 
     return data
 
@@ -37,7 +36,10 @@ def get_request_form_values(incoming_request):
 def format_request_input(user_name, protected_peddle, unprotected_peddle, highest_peddle_in_hand, has_banker,
                          has_sold_out, has_double_crossed, has_utterly_wiped_out):
     data = [{'name': a, 'protected_peddle': b, 'unprotected_peddle': c, 'highest_peddle_in_hand': d,
-                   'has_banker': e, 'has_sold_out': f, 'has_double_crossed': g, 'has_utterly_wiped_out': h} for a, b, c, d, e, f, g, h in zip(user_name, protected_peddle, unprotected_peddle, highest_peddle_in_hand, has_banker, has_sold_out, has_double_crossed, has_utterly_wiped_out)]
+             'has_banker': e, 'has_sold_out': f, 'has_double_crossed': g, 'has_utterly_wiped_out': h} for
+            a, b, c, d, e, f, g, h in
+            zip(user_name, protected_peddle, unprotected_peddle, highest_peddle_in_hand, has_banker, has_sold_out,
+                has_double_crossed, has_utterly_wiped_out)]
     return data
 
 
