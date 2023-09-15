@@ -11,10 +11,21 @@ def round_entry_page():
     round_number = client.retrieve_round_number("game_1")
     if request.method == 'POST':
         formatted_form_data = get_request_form_values(request)
+        process_round(round_number, formatted_form_data)
 
     player_list = client.list_players("game_1", "players")
     return render_template('round.html', round=round_number, player_names=player_list,
                            number_of_players=len(player_list))
+
+
+def process_round(round_number, input_data):
+    #write_raw_input_to_db(input_data)
+    #calculate_net_profit()
+    #calculate_penalties()
+    #calculate_best_peddle()
+    #calculate_bonus()
+    #write_processed_input_to_db()
+    #update_round_number()
 
 
 def get_request_form_values(incoming_request):
