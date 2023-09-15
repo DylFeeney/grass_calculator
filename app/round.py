@@ -11,7 +11,7 @@ def round_entry_page():
     round_number = client.retrieve_round_number("game_1")
     if request.method == 'POST':
         formatted_form_data = get_request_form_values(request)
-        print(formatted_form_data['data'][0])
+        #print(formatted_form_data['data'][0])
         process_round(round_number, formatted_form_data)
 
     player_list = client.list_players("game_1", "players")
@@ -19,16 +19,34 @@ def round_entry_page():
                            number_of_players=len(player_list))
 
 
-def process_round(round_number, input_data):
+def process_round(round_number, data):
     print("Process round")
     #write_raw_input_to_db(input_data)
-    #calculate_banker()
+    data = calculate_banker(data)
     #calculate_net_profit()
     #calculate_penalties()
     #calculate_best_peddle()
     #calculate_bonus()
     #write_processed_input_to_db()
     #update_round_number()
+
+
+def calculate_banker(input):
+    banker_index = input["banker_holder"]
+    if banker_index != "-1":
+        # Getting the player list which contains the round input data
+        player_data = input["data"]
+        # Looping over all players to remove 5000 if they have 5000 or more. This is removed from all players
+        # apart from the player who has the banker card
+        for index, x in enumerate(player_data):
+            if not index == banker_index:
+                # Check if the player has more then 5000 money or not
+                if x["unprotected_peddle"] >= 5000:
+                    # Taking 5000 from the current player and adding it to the banker players value
+                    x["unprotected_peddle"] -= 5000
+                    player_data[banker_index]["unprotected_peddle"] += 5000
+    return input
+
 
 
 def get_request_form_values(incoming_request):
@@ -49,11 +67,16 @@ def get_request_form_values(incoming_request):
 
 def format_request_input(user_name, protected_peddle, unprotected_peddle, highest_peddle_in_hand, has_banker,
                          has_sold_out, has_double_crossed, has_utterly_wiped_out):
+
+    # Remapping the lists that contain the money values. They should be integers not strings
+    protected_peddle = list(map(int, protected_peddle))
+    unprotected_peddle = list(map(int, unprotected_peddle))
+    highest_peddle_in_hand = list(map(int, highest_peddle_in_hand))
+
     banker_holder = -1
-    for id, data in enumerate(has_banker):
-        print(has_banker)
+    for index, data in enumerate(has_banker):
         if data == '1':
-            banker_holder = id
+            banker_holder = index
     data = {'banker_holder': banker_holder, 'data': [{'name': a, 'protected_peddle': b, 'unprotected_peddle': c, 'highest_peddle_in_hand': d,
              'has_banker': e, 'has_sold_out': f, 'has_double_crossed': g, 'has_utterly_wiped_out': h} for
             a, b, c, d, e, f, g, h in
