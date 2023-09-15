@@ -24,7 +24,7 @@ def process_round(round_number, data):
     #write_raw_input_to_db(input_data)
     banker_data = calculate_banker(data)
     net_profit_data = calculate_net_profit(banker_data)
-    #calculate_penalties()
+    penalties_data = calculate_penalties(net_profit_data)
     #calculate_best_peddle()
     #calculate_bonus()
     #write_processed_input_to_db()
@@ -52,6 +52,24 @@ def calculate_net_profit(input):
     player_data = input["data"]
     for player in player_data:
         player['net_profit'] = player["protected_peddle"] + player["unprotected_peddle"]
+    return input
+
+
+def calculate_penalties(input):
+    """
+    Calculate the penalties from players holding specific cards in their hands, the penalty values are:
+    Sold Out -$25,000
+    Double crossed -$50,000
+    Utterly Wiped Out -$100,000
+    """
+    player_data = input["data"]
+    for player in player_data:
+        if player["has_sold_out"] == "1":
+            player["penalties"] -= 25000
+        if player["has_double_crossed"] == "1":
+            player["penalties"] -= 50000
+        if player["has_utterly_wiped_out"] == "1":
+            player["penalties"] -= 100000
     return input
 
 
@@ -84,7 +102,7 @@ def format_request_input(user_name, protected_peddle, unprotected_peddle, highes
         if data == '1':
             banker_holder = index
     data = {'banker_holder': banker_holder, 'data': [{'name': a, 'protected_peddle': b, 'unprotected_peddle': c, 'highest_peddle_in_hand': d,
-             'has_banker': e, 'has_sold_out': f, 'has_double_crossed': g, 'has_utterly_wiped_out': h, 'net_profit': 0} for
+             'has_banker': e, 'has_sold_out': f, 'has_double_crossed': g, 'has_utterly_wiped_out': h, 'net_profit': 0, 'penalties': 0} for
             a, b, c, d, e, f, g, h in
             zip(user_name, protected_peddle, unprotected_peddle, highest_peddle_in_hand, has_banker, has_sold_out,
                 has_double_crossed, has_utterly_wiped_out)]}
