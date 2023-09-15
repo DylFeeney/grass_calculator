@@ -22,8 +22,8 @@ def round_entry_page():
 def process_round(round_number, data):
     print("Process round")
     #write_raw_input_to_db(input_data)
-    data = calculate_banker(data)
-    #calculate_net_profit()
+    banker_data = calculate_banker(data)
+    net_profit_data = calculate_net_profit(banker_data)
     #calculate_penalties()
     #calculate_best_peddle()
     #calculate_bonus()
@@ -47,6 +47,12 @@ def calculate_banker(input):
                     player_data[banker_index]["unprotected_peddle"] += 5000
     return input
 
+
+def calculate_net_profit(input):
+    player_data = input["data"]
+    for player in player_data:
+        player['net_profit'] = player["protected_peddle"] + player["unprotected_peddle"]
+    return input
 
 
 def get_request_form_values(incoming_request):
@@ -78,7 +84,7 @@ def format_request_input(user_name, protected_peddle, unprotected_peddle, highes
         if data == '1':
             banker_holder = index
     data = {'banker_holder': banker_holder, 'data': [{'name': a, 'protected_peddle': b, 'unprotected_peddle': c, 'highest_peddle_in_hand': d,
-             'has_banker': e, 'has_sold_out': f, 'has_double_crossed': g, 'has_utterly_wiped_out': h} for
+             'has_banker': e, 'has_sold_out': f, 'has_double_crossed': g, 'has_utterly_wiped_out': h, 'net_profit': 0} for
             a, b, c, d, e, f, g, h in
             zip(user_name, protected_peddle, unprotected_peddle, highest_peddle_in_hand, has_banker, has_sold_out,
                 has_double_crossed, has_utterly_wiped_out)]}
