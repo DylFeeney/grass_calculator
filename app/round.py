@@ -51,7 +51,7 @@ def calculate_banker(input):
 def calculate_net_profit(input):
     player_data = input["data"]
     for player in player_data:
-        player['net_profit'] = player["protected_peddle"] + player["unprotected_peddle"]
+        player["calculated_values"]['net_profit'] = player["protected_peddle"] + player["unprotected_peddle"]
     return input
 
 
@@ -65,11 +65,11 @@ def calculate_penalties(input):
     player_data = input["data"]
     for player in player_data:
         if player["has_sold_out"] == "1":
-            player["penalties"] -= 25000
+            player["calculated_values"]["penalties"] -= 25000
         if player["has_double_crossed"] == "1":
-            player["penalties"] -= 50000
+            player["calculated_values"]["penalties"] -= 50000
         if player["has_utterly_wiped_out"] == "1":
-            player["penalties"] -= 100000
+            player["calculated_values"]["penalties"] -= 100000
     return input
 
 
@@ -102,7 +102,8 @@ def format_request_input(user_name, protected_peddle, unprotected_peddle, highes
         if data == '1':
             banker_holder = index
     data = {'banker_holder': banker_holder, 'data': [{'name': a, 'protected_peddle': b, 'unprotected_peddle': c, 'highest_peddle_in_hand': d,
-             'has_banker': e, 'has_sold_out': f, 'has_double_crossed': g, 'has_utterly_wiped_out': h, 'net_profit': 0, 'penalties': 0} for
+             'has_banker': e, 'has_sold_out': f, 'has_double_crossed': g, 'has_utterly_wiped_out': h,
+                'calculated_values': {'net_profit': 0, 'penalties': 0, 'best_pedal': 0, 'bonus': 0}} for
             a, b, c, d, e, f, g, h in
             zip(user_name, protected_peddle, unprotected_peddle, highest_peddle_in_hand, has_banker, has_sold_out,
                 has_double_crossed, has_utterly_wiped_out)]}
