@@ -25,8 +25,8 @@ def process_round(round_number, data):
     banker_data = calculate_banker(data)
     net_profit_data = calculate_net_profit(banker_data)
     penalties_data = calculate_penalties(net_profit_data)
-    #calculate_best_peddle()
-    #calculate_bonus()
+    apply_calculations(round_number, penalties_data)
+    #calculate_bonus(apply_calculations)
     #write_processed_input_to_db()
     #update_round_number()
 
@@ -73,6 +73,21 @@ def calculate_penalties(input):
     return input
 
 
+def apply_calculations(round_number, input):
+    player_data = input["data"]
+    for player in player_data:
+        # Net profit - penalties - highest peddle in hand
+        penalties_calculation = player["calculated_values"]["net_profit"] - player["calculated_values"]["penalties"] - player["highest_peddle_in_hand"]
+        # If we are on round 1 and the penalties_calculation is less than 0, set the value to be 0.
+        # You can't go below 0 in round one.
+        # In rounds 2 onwards it is possible to have this value enter into minus
+        if round_number == 1 and penalties_calculation < 0:
+            player["calculated_values"]["calculated_total"] = 0
+        else:
+            player["calculated_values"]["calculated_total"] = penalties_calculation
+    return input
+
+
 def get_request_form_values(incoming_request):
     user_name = incoming_request.form.getlist('user_name')
     protected_peddle = incoming_request.form.getlist('protected_peddle')
@@ -103,7 +118,7 @@ def format_request_input(user_name, protected_peddle, unprotected_peddle, highes
             banker_holder = index
     data = {'banker_holder': banker_holder, 'data': [{'name': a, 'protected_peddle': b, 'unprotected_peddle': c, 'highest_peddle_in_hand': d,
              'has_banker': e, 'has_sold_out': f, 'has_double_crossed': g, 'has_utterly_wiped_out': h,
-                'calculated_values': {'net_profit': 0, 'penalties': 0, 'best_pedal': 0, 'bonus': 0}} for
+                'calculated_values': {'net_profit': 0, 'penalties': 0, 'calculated_total': 0, 'final_value': 0}} for
             a, b, c, d, e, f, g, h in
             zip(user_name, protected_peddle, unprotected_peddle, highest_peddle_in_hand, has_banker, has_sold_out,
                 has_double_crossed, has_utterly_wiped_out)]}
