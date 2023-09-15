@@ -20,6 +20,7 @@ def round_entry_page():
 
 def process_round(round_number, input_data):
     #write_raw_input_to_db(input_data)
+    #calculate_banker()
     #calculate_net_profit()
     #calculate_penalties()
     #calculate_best_peddle()
