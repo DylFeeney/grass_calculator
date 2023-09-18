@@ -56,3 +56,8 @@ class Mongo:
         old_data = {"round_number": current_round_number}
         new_data = {"$set": {"round_number": new_round_number}}
         collection.update_one(old_data, new_data)
+
+    # Player Name
+    def insert_data(self, database_name, collection_name, data):
+            database, collection = self.retrieve_collection(database_name, collection_name)
+            collection.insert_one(data)

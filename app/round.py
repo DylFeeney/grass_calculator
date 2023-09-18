@@ -8,30 +8,37 @@ round_entry = Blueprint('round_entry', __name__, template_folder='templates')
 @round_entry.route('/round-entry', methods=['POST', 'GET'])
 def round_entry_page():
     client = Mongo()
-    round_number = client.retrieve_round_number("game_1")
+    database = "game_1"
+    round_number = client.retrieve_round_number(database)
     if request.method == 'POST':
-        formatted_form_data = get_request_form_values(request)
-        database = "game_1"
+        formatted_form_data = get_request_form_values(round_number, request)
         process_round(client, database, round_number, formatted_form_data)
-        round_number = client.retrieve_round_number("game_1")
+        round_number = client.retrieve_round_number(database)
 
-    player_list = client.list_players("game_1", "players")
+    player_list = client.list_players(database, "players")
     return render_template('round.html', round=round_number, player_names=player_list,
                            number_of_players=len(player_list))
 
 
 def process_round(mongo_client, database, round_number, data):
-    print("Process round")
-    #write_raw_input_to_db(input_data)
-    print(data)
+    mongo_client.insert_data(database, "round_info_data", data)
     banker_data = calculate_banker(data)
     net_profit_data = calculate_net_profit(banker_data)
     penalties_data = calculate_penalties(net_profit_data)
     calc_applied = apply_calculations(round_number, penalties_data)
     final_data = calculate_bonus(calc_applied)
-    print(final_data)
-    #write_processed_input_to_db()
+    write_processed_input_to_db(mongo_client, database, final_data)
     update_round_number(mongo_client, database, round_number)
+
+
+def write_processed_input_to_db(mongo_client, database, input):
+    player_data = input["data"]
+    for player in player_data:
+        formatted_data = {
+            'name': player['name'],
+            'current_score': player['calculated_values']['calculated_total']
+        }
+        mongo_client.insert_data(database, "processed_round_info", formatted_data)
 
 
 def calculate_banker(input):
@@ -109,7 +116,7 @@ def update_round_number(client, database, current_round_number):
     client.update_round_number(database, current_round_number)
 
 
-def get_request_form_values(incoming_request):
+def get_request_form_values(round_number, incoming_request):
     user_name = incoming_request.form.getlist('user_name')
     protected_peddle = incoming_request.form.getlist('protected_peddle')
     unprotected_peddle = incoming_request.form.getlist('unprotected_peddle')
@@ -119,13 +126,13 @@ def get_request_form_values(incoming_request):
     has_double_crossed = process_checkbox_list(incoming_request.form.getlist('has_double_crossed'))
     has_utterly_wiped_out = process_checkbox_list(incoming_request.form.getlist('has_utterly_wiped_out'))
 
-    data = format_request_input(user_name, protected_peddle, unprotected_peddle, highest_peddle_in_hand, has_banker,
+    data = format_request_input(round_number, user_name, protected_peddle, unprotected_peddle, highest_peddle_in_hand, has_banker,
                                 has_sold_out, has_double_crossed, has_utterly_wiped_out)
 
     return data
 
 
-def format_request_input(user_name, protected_peddle, unprotected_peddle, highest_peddle_in_hand, has_banker,
+def format_request_input(round_number, user_name, protected_peddle, unprotected_peddle, highest_peddle_in_hand, has_banker,
                          has_sold_out, has_double_crossed, has_utterly_wiped_out):
 
     # Remapping the lists that contain the money values. They should be integers not strings
@@ -137,9 +144,10 @@ def format_request_input(user_name, protected_peddle, unprotected_peddle, highes
     for index, data in enumerate(has_banker):
         if data == '1':
             banker_holder = index
-    data = {'banker_holder': banker_holder, 'data': [{'name': a, 'protected_peddle': b, 'unprotected_peddle': c, 'highest_peddle_in_hand': d,
-             'has_banker': e, 'has_sold_out': f, 'has_double_crossed': g, 'has_utterly_wiped_out': h,
-                'calculated_values': {'net_profit': 0, 'penalties': 0, 'calculated_total': 0, 'bonus': "0"}} for
+    data = {'round_number': round_number, 'banker_holder': banker_holder, 'data': [{'name': a, 'protected_peddle': b,
+             'unprotected_peddle': c, 'highest_peddle_in_hand': d, 'has_banker': e, 'has_sold_out': f,
+             'has_double_crossed': g, 'has_utterly_wiped_out': h,
+             'calculated_values': {'net_profit': 0, 'penalties': 0, 'calculated_total': 0, 'bonus': "0"}} for
             a, b, c, d, e, f, g, h in
             zip(user_name, protected_peddle, unprotected_peddle, highest_peddle_in_hand, has_banker, has_sold_out,
                 has_double_crossed, has_utterly_wiped_out)]}
