@@ -38,7 +38,8 @@ def write_processed_input_to_db(mongo_client, database, input):
             'name': player['name'],
             'current_score': player['calculated_values']['calculated_total']
         }
-        mongo_client.insert_data(database, "processed_round_info", formatted_data)
+        #mongo_client.insert_data(database, "processed_round_info", formatted_data)
+        mongo_client.update_score(database, "processed_round_info", player['name'], player['calculated_values']['calculated_total'])
 
 
 def calculate_banker(input):

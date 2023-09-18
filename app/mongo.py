@@ -59,5 +59,21 @@ class Mongo:
 
     # Player Name
     def insert_data(self, database_name, collection_name, data):
-            database, collection = self.retrieve_collection(database_name, collection_name)
+        database, collection = self.retrieve_collection(database_name, collection_name)
+        collection.insert_one(data)
+
+    def update_score(self, database_name, collection_name, name, score):
+        database, collection = self.retrieve_collection(database_name, collection_name)
+        response = collection.find_one({"name": name}, {})
+        print(response)
+        if response != None:
+            new_score = response['current_score'] + score
+            search_data = {"name": name}
+            updated_data = {"$set": {"current_score": new_score}}
+            collection.update_one(search_data, updated_data)
+        else:
+            data = {
+                "name": name,
+                "current_score": score
+            }
             collection.insert_one(data)
