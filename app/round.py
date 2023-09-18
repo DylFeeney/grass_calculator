@@ -11,29 +11,32 @@ def round_entry_page():
     round_number = client.retrieve_round_number("game_1")
     if request.method == 'POST':
         formatted_form_data = get_request_form_values(request)
-        #print(formatted_form_data['data'][0])
-        process_round(round_number, formatted_form_data)
+        database = "game_1"
+        process_round(client, database, round_number, formatted_form_data)
+        round_number = client.retrieve_round_number("game_1")
 
     player_list = client.list_players("game_1", "players")
     return render_template('round.html', round=round_number, player_names=player_list,
                            number_of_players=len(player_list))
 
 
-def process_round(round_number, data):
+def process_round(mongo_client, database, round_number, data):
     print("Process round")
     #write_raw_input_to_db(input_data)
+    print(data)
     banker_data = calculate_banker(data)
     net_profit_data = calculate_net_profit(banker_data)
     penalties_data = calculate_penalties(net_profit_data)
-    apply_calculations(round_number, penalties_data)
-    #calculate_bonus(apply_calculations)
+    calc_applied = apply_calculations(round_number, penalties_data)
+    final_data = calculate_bonus(calc_applied)
+    print(final_data)
     #write_processed_input_to_db()
-    #update_round_number()
+    update_round_number(mongo_client, database, round_number)
 
 
 def calculate_banker(input):
     banker_index = input["banker_holder"]
-    if banker_index != "-1":
+    if banker_index != -1:
         # Getting the player list which contains the round input data
         player_data = input["data"]
         # Looping over all players to remove 5000 if they have 5000 or more. This is removed from all players
@@ -77,7 +80,7 @@ def apply_calculations(round_number, input):
     player_data = input["data"]
     for player in player_data:
         # Net profit - penalties - highest peddle in hand
-        penalties_calculation = player["calculated_values"]["net_profit"] - player["calculated_values"]["penalties"] - player["highest_peddle_in_hand"]
+        penalties_calculation = player["calculated_values"]["net_profit"] + player["calculated_values"]["penalties"] - player["highest_peddle_in_hand"]
         # If we are on round 1 and the penalties_calculation is less than 0, set the value to be 0.
         # You can't go below 0 in round one.
         # In rounds 2 onwards it is possible to have this value enter into minus
@@ -86,6 +89,24 @@ def apply_calculations(round_number, input):
         else:
             player["calculated_values"]["calculated_total"] = penalties_calculation
     return input
+
+
+def calculate_bonus(input):
+    player_data = input["data"]
+    round_winner_index = -1
+    highest_value = -1
+    for index, player in enumerate(player_data):
+        if highest_value < player["calculated_values"]["calculated_total"]:
+            round_winner_index = index
+            highest_value = player["calculated_values"]["calculated_total"]
+    # Setting the bonus value for the round winner
+    player_data[round_winner_index]["calculated_values"]["calculated_total"] += 25000
+    player_data[round_winner_index]["calculated_values"]["bonus"] = "1"
+    return input
+
+
+def update_round_number(client, database, current_round_number):
+    client.update_round_number(database, current_round_number)
 
 
 def get_request_form_values(incoming_request):
@@ -118,7 +139,7 @@ def format_request_input(user_name, protected_peddle, unprotected_peddle, highes
             banker_holder = index
     data = {'banker_holder': banker_holder, 'data': [{'name': a, 'protected_peddle': b, 'unprotected_peddle': c, 'highest_peddle_in_hand': d,
              'has_banker': e, 'has_sold_out': f, 'has_double_crossed': g, 'has_utterly_wiped_out': h,
-                'calculated_values': {'net_profit': 0, 'penalties': 0, 'calculated_total': 0, 'final_value': 0}} for
+                'calculated_values': {'net_profit': 0, 'penalties': 0, 'calculated_total': 0, 'bonus': "0"}} for
             a, b, c, d, e, f, g, h in
             zip(user_name, protected_peddle, unprotected_peddle, highest_peddle_in_hand, has_banker, has_sold_out,
                 has_double_crossed, has_utterly_wiped_out)]}
