@@ -77,3 +77,12 @@ class Mongo:
                 "current_score": score
             }
             collection.insert_one(data)
+
+    def get_score_info(self, database_name, collection_name):
+        database, collection = self.retrieve_collection(database_name, collection_name)
+        response = collection.find()
+        players = []
+        for player in response:
+            players.append(player)
+        players.sort(key=lambda x: x["current_score"], reverse=True)
+        return players

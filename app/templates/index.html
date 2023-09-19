@@ -12,6 +12,9 @@
                 <p class="text-center h1">
                     Grass Scoreboard
                 </p>
+                <p class="text-center h2">
+                    Current round: {{ round_number }}
+                </p>
             </div>
         </div>
         <div class="row mt-2">
@@ -28,6 +31,26 @@
                 </div>
             </div>
         </div>
+        {% if round_number > 1 %}
+            <div class="row mt-5">
+                <table class="table table-striped">
+                  <thead class="thead-dark">
+                    <tr>
+                      <th scope="col">Name</th>
+                      <th scope="col">Score</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for item in players %}
+                    <tr>
+                      <td>{{ item.name }}</td>
+                      <td>{{ item.current_score }}</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+            </div>
+        {% endif %}
     </div>
 </body>
 </html>
